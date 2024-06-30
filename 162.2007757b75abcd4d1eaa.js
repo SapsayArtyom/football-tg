@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfootball_game=self.webpackChunkfootball_game||[]).push([[162],{2162:(e,a,l)=>{l.r(a),l(4732),l(9010),l(8480),l(8928),l(5285),l(6958),l(6444),l(7559),l(8723),l(7252),l(9935)}}]);
