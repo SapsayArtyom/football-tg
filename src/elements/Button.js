@@ -1,4 +1,4 @@
-import { Container, Sprite, Text, Graphics } from "pixi.js";
+import { Container, Sprite, Text, Graphics, Texture } from "pixi.js";
 
 
 export default class Button extends Container {
@@ -69,7 +69,7 @@ export default class Button extends Container {
     }
 
     changeTexture(textureName) {
-        const texture = new Texture.from(textureName);
+        const texture = Texture.from(textureName);
         this.btn.texture = texture;
     }
 

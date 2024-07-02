@@ -37,6 +37,7 @@ export default class StartScreen extends Container {
         this.addChild(this.screenBack);
 
         this.screenContainer = new Container();
+        this.screenContainer.label = 'screenContainer';
         this.addChild(this.screenContainer);        
 
         this.timerCont = new Container();
@@ -132,8 +133,10 @@ export default class StartScreen extends Container {
         this.screenBack.rect(0, 0, this.screenContainer.width + 140, this.screenContainer.height + 170);
         this.screenBack.fill(0x101010);
         this.screenBack.x = (this.width - this.screenBack.getBounds().width) / 2;
-        this.screenBack.y = this.screenContainer.y - 85;
-        this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
+        // this.screenBack.y = this.screenContainer.y - 85;
+        // this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
+        this.screenBack.y = 350;
+        this.screenContainer.y = 420;
 
         if(this.game.width < 270) {
             this.drawScene(0.7);
