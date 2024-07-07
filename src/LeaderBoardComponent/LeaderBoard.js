@@ -1,4 +1,4 @@
-import { Container, Sprite, TilingSprite, Text } from "pixi.js";
+import { Container, Sprite, Text } from "pixi.js";
 
 export default class LeaderBoard extends Container {
 
@@ -17,11 +17,6 @@ export default class LeaderBoard extends Container {
         bg.width = this.game.baseWidth;
         bg.height = this.game.baseHeight;
         this.addChild(bg);
-
-        // const tileCloud = new TilingSprite.from('clouds_bottom').texture, this.game.app.screen.width, 600 );
-        // // const tileCloud = new TilingSprite.from('clouds_bottom').texture, this.game.app.screen.width, this.game.app.screen.height );
-        // tileCloud.position.y = this.game.app.screen.height - tileCloud.height;
-        // this.addChild(tileCloud);
     }
 
     createBoard() {
@@ -30,7 +25,6 @@ export default class LeaderBoard extends Container {
         const board = Sprite.from('leaderBoard');
         board.name = 'leaderBoard';
         const scaleSet = 900 / board.width;
-        // const scaleSet = 251 / board.width;
         board.scale.set(scaleSet, scaleSet);
         this.boardCont.addChild(board);
         this.boardCont.x = (this.game.baseWidth - this.boardCont.getBounds().width) / 2;
@@ -55,7 +49,6 @@ export default class LeaderBoard extends Container {
     }
 
     showScores(value) {
-        console.log('draw updated scores :', value);
         this.scoreCont.removeChildren();
         const scores = value;
         const posX =  this.boardCont.x;
@@ -84,7 +77,6 @@ export default class LeaderBoard extends Container {
             score.x = this.game.baseWidth - score.width - Math.floor(posX) - 95;
             lineScore.addChild(score);
             lineScore.y = (name.height + 10) * i + 45 + Math.floor(posY);
-            // lineScore.y = 29 * i + 45 + Math.floor(posY);
         }
     }
 }

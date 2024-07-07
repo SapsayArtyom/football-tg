@@ -1,4 +1,5 @@
-import { Container, Text, sound } from "pixi.js";
+import { Container, Text } from "pixi.js";
+import { sound } from '@pixi/sound';
 
 export default class Timer extends Container {
 
@@ -6,21 +7,18 @@ export default class Timer extends Container {
         super();
 
         this.name = 'timer';
-        this.deadlineAt = options.deadlineAt;
+        // this.deadlineAt = options.deadlineAt;
         this.fontFamily = options.fontFamily || 'LuckiestGuy';
         this.fontSize = options.fontSize || 40;
         this.fontWeight = options.fontWeight || 'bold';
         this.strokeThickness = options.strokeThickness || 0;
         this.stroke = options.stroke || 'black';
         this.fontColor = options.fontColor || 0xffffff;
-        // const beforeCounter = options.beforeCounter || false;
 
         this.time = -2;
         this.timeMinute = 0;
         this.countdownMinute = 0;
         this.countdownSec = 0;
-
-        // this.createTimer();
 
         this.timer = new Text({text :`00:00`, 
             style: {
@@ -33,10 +31,11 @@ export default class Timer extends Container {
                 letterSpacing: 3
             }});
         this.addChild(this.timer);
+
+        // this.createTimer();
     }
 
-    createTimer() {
-
+    createTimer(time) {
         this.timer.style.fill = 0xff0000;
         this.timer.text = `00:0${Math.abs(this.time)}`;
         this.startTimer = setInterval(()=>{
@@ -45,7 +44,7 @@ export default class Timer extends Container {
             if( this.time === 0 ) {
                 // clearInterval(this.startTimer);
                 this.removeStartTimer();
-                this.countdownTimer();
+                this.countdownTimer(time);
             }
         }, 1000);
     }
@@ -66,17 +65,19 @@ export default class Timer extends Container {
         this.timer.text = `${minute}:${sec}`;
     }
 
-    countdownTimer() {  
+    countdownTimer(deadline, callback) {  
+        let timeRemaining = deadline;
         this.downTimer = setInterval(()=>{
-            const time = this.getTimeRemaining(this.deadlineAt);
+            // const time = this.getTimeRemaining(this.deadlineAt);
+            const time = this.formatTime(timeRemaining);
             if(time.minutes >= 0 && time.seconds >= 0) {
                 this.timer.style.fill = this.fontColor;
-                const sec = time.seconds < 10 ? `0${time.seconds}` : `${time.seconds}`;
-                const minute = time.minutes < 10 ? `0${time.minutes}` : `${time.minutes}`;
-                this.timer.text = `${minute}:${sec}`;
+                this.timer.text = `${time.minutes}:${time.seconds}`;
+                timeRemaining -= 1000;
             } else {
                 this.timer.style.fill = this.fontColor;
                 this.timer.text = `00:00`;
+                callback();
                 this.removeTimer.bind(this)();
                 // clearInterval(downTimer);
             }           
@@ -86,6 +87,19 @@ export default class Timer extends Container {
     removeTimer() {
         clearInterval(this.downTimer);
         if(sound) sound.stopAll();
+    }
+
+    formatTime(ms) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+    
+        // return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        return {
+            hours: String(hours).padStart(2, '0'), 
+            minutes :String(minutes).padStart(2, '0'), 
+            seconds: String(seconds).padStart(2, '0')};
     }
 
     getTimeRemaining(endTime){

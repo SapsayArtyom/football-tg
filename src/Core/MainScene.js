@@ -8,9 +8,11 @@ import SoundManager from '../UI/SoundManager';
 import { sound } from '@pixi/sound';
 import ManagerPoints from '../UI/ManagerPoints';
 import PlayScene from '../UI/PlayScene';
+import Timer from '../elements/Timer';
 import Ball from '../elements/Ball';
 import Viewers from '../GameComponents/Viewers';
 import Goal from '../GameComponents/Goal';
+import LeaderBoard from "../LeaderBoardComponent/LeaderBoard";
 
 export default class MainScene extends Container {
 
@@ -25,13 +27,8 @@ export default class MainScene extends Container {
         this.gameInit = false;
 
         this.heightHeader = 150;
-
         this.totalBonus = 0;
-
         this.time = -2;
-        this.timeMinute = 0;
-        this.countdownMinute = 0;
-        this.countdownSec = 0;
 
         this.soundNow = '';
         this.username = this.game.nickName;
@@ -49,8 +46,9 @@ export default class MainScene extends Container {
         this.createScore();
         this.createPlayScene();
         
-        // this.createTimer();
+        this.createTimer();
         this.createMultiplyBar();
+        this.createSoundIcon();
 
         this.createStartScreen();
     }
@@ -111,7 +109,7 @@ export default class MainScene extends Container {
         this.ball.x = this.game.baseWidth / 2;
         this.ball.y = this.managerPoints.arrPosition[this.managerPoints.activePoint] - this.ball.height + 4;
         this.mainContainer.addChild(this.ball);
-        this.ball.emitter.on('endRound', this.restartGame.bind(this));
+        this.ball.emitter.on('endRound', this.restartRound.bind(this));
 
         this.goalLeft = 420;
         // const graphLeft = new Graphics();
@@ -139,7 +137,7 @@ export default class MainScene extends Container {
         this.managerPoints.interactiveChildren = false;
     }
 
-    restartGame() {
+    restartRound() {
         this.showBonus(this.bonusKick);
         this.totalBonus += +this.amountBonus * this.multiplyBar.value;
         this.updateCounter(this.totalBonus);
@@ -253,36 +251,46 @@ export default class MainScene extends Container {
     }
 
     createStartScreen() {
-        const tintCont = new Container();
-        tintCont.interactive = true;
+        // const tintCont = new Container();
+        // tintCont.interactive = true;
 
-        const graph = new Graphics();
-        graph.rect(0, 0, this.game.app.screen.width, this.game.app.screen.height);
-        graph.fill({color: 0x000000, alpha: 0.2});
-        tintCont.addChild(graph);
+        // const graph = new Graphics();
+        // graph.rect(0, 0, this.game.app.screen.width, this.game.app.screen.height);
+        // graph.fill({color: 0x000000, alpha: 1});
+        // graph.label = 'tint cont';
+        // tintCont.addChild(graph);
 
         this.startScreen = new StartScreen({
             game: this.game
         });
-        tintCont.addChild(this.startScreen);
+        // tintCont.addChild(this.startScreen);
         this.startScreen.emitter.on('countdown', () => {
             this.gameInit = true;
             this.managerPoints.startPositionBall();
             this.username = this.startScreen.valueInputName;
-            tintCont.interactive = false;
-            this.createSoundIcon();
-            tintCont.destroy();
+            // tintCont.interactive = false;
+            // this.createSoundIcon();
+            this.startScreen.hide();
             sound.play('crowd_ambient', {loop: true, volume: 0.75});
             this.soundNow = 'crowd_ambient';
+            this.timer.countdownTimer(5000, () => this.restartGame());
+            // this.timer.createTimer(15000);
         });
-        tintCont.x = -(tintCont.width - this.game.app.screen.width) / 2;
-        this.mainContainer.addChild(tintCont);
+        // tintCont.x = -(tintCont.width - this.game.app.screen.width) / 2;
+        this.mainContainer.addChild(this.startScreen);
+    }
+
+    createLeaderBoard() {
+        this.leaderboard = new LeaderBoard({
+            game: this.game
+        });
     }
 
     createSoundIcon() {
         this.sound = new SoundManager({
             width: 110,
-            flag: this.startScreen.soundFlag
+            // flag: this.startScreen.soundFlag
+            flag: 'off'
         });
         this.sound.position.set(this.game.baseWidth - this.sound.width - 25, 25);
         this.mainContainer.addChild(this.sound);
@@ -313,7 +321,7 @@ export default class MainScene extends Container {
 
     createTimer() {
         this.timer = new Timer({
-            deadlineAt: this.game.deadlineAt,
+            // deadlineAt: 10000,
             fontFamily: 'OpenSans_BoldItalic',
             fontSize: 100,
             fontWeight: 'normal',
@@ -322,7 +330,7 @@ export default class MainScene extends Container {
         this.timer.x = Math.floor(this.game.app.screen.width - this.timer.width) / 2;
         this.timer.y = Math.floor(this.heightHeader - this.timer.height) / 2;
         this.mainContainer.addChild(this.timer);
-        this.timer.countdownTimer();
+        // this.timer.countdownTimer();
     }
 
     updateCounter(value) {
@@ -334,5 +342,12 @@ export default class MainScene extends Container {
             username: this.username, 
             score: this.totalBonus
         };
+    }
+
+    restartGame() {
+        this.game.setScore(null, 500);
+        this.startScreen.show();
+        this.totalBonus = 0;
+        this.updateCounter(this.totalBonus);
     }
 }

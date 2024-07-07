@@ -25,11 +25,13 @@ export default class MainGame {
     }
 
     async loadMyAssets() {
-        const assets = [ { alias:'bg_game', src: './assets/Gameplay/bg.png'},
+        const assets = [ 
+            { alias:'bg_game', src: './assets/Gameplay/bg.png'},
+            { alias:'leaderboard_bg', src: './assets/Leaderboards/leaderboard_bg.png'},
+            { alias:'bg_startscreen', src: './assets/Leaderboards/leaderboard_bg_large.png'},
             { alias:'bg_panel', src: './assets/Gameplay/bg_panel.png'},
             { alias:'top_bar', src: './assets/Gameplay/UI_top_bar.png'},
                 
-            { alias:'bg_startscreen', src: './assets/Leaderboards/leaderboard_bg_large.png'},
             { alias:'ball', src: './assets/Gameplay/ball_kick_start/ball_kick_start_00001.png'},
             { alias:'ball_blur', src: './assets/Gameplay/ball_kick_start/ball_kick_start_00002.png'},
                 
@@ -37,7 +39,6 @@ export default class MainGame {
             { alias:'ballStand', src: './assets/Gameplay/ballstand.png'},
             { alias:'btn_tap_active', src: './assets/Gameplay/btn_tap_active.png'},
             { alias:'btn_tap_inactive', src: './assets/Gameplay/btn_tap_inactive.png'},
-                
                 
             { alias:'icon_sound_on', src: './assets/Gameplay/icon_sound_on.png'},
             { alias:'icon_sound_off', src: './assets/Gameplay/icon_sound_off.png'},
@@ -110,17 +111,14 @@ export default class MainGame {
         await Assets.addBundle('main', assets);
         await Assets.loadBundle('main');
 
+        await this.getUsers();
+        await this.getScore();
         this.init();
     }
 
     async init() {
 
         this.initialization = true;
-        // this.app = new PIXI.Application({ 
-        //     width: this.baseWidth,
-        //     height: this.baseHeight, 
-        //     antialias: true});
-        // document.body.appendChild(this.app.view);
 
         this.app = new Application();
         await this.app.init({
@@ -128,9 +126,6 @@ export default class MainGame {
             height: this.baseHeight,
             backgroundColor: 0x0070e7
         });
-        // document.getElementById('game').appendChild(this.app.canvas);
-        // document.body.appendChild(this.app.canvas);
-
         globalThis.__PIXI_APP__ = this.app;
 
         const div = document.createElement('div');
@@ -160,18 +155,6 @@ export default class MainGame {
         div.style.position = 'relative';
         document.body.append(div);
         div.appendChild(this.app.canvas);
-        // document.body.append(div);
-        // div.append(this.app.view);
-
-        // const canvas = document.getElementsByTagName("canvas");
-        // canvas[0].style.position = "absolute";
-        // canvas[0].style.transform = "translate(-50%, 0)";
-        // canvas[0].style.top = "0";
-        // canvas[0].style.left = "50%";
-        // canvas[0].style.maxHeight = "unset";
-        // canvas[0].style.maxWidth = "100%";
-
-        // this.defineScreenSize();
         
         this.mainContainer.name = 'mainContainer';
         this.app.stage.addChild(this.mainContainer);
@@ -198,31 +181,14 @@ export default class MainGame {
         const clientHeight = window.innerHeight;
         const assetsProportion = this.height / this.width;
         const screenProportions = clientHeight / clientWidth;
-        // debugger;
         if (clientWidth <= 1024 /* 414 */ && Math.abs(assetsProportion - screenProportions) > 0.1) { // proportions are different
             this.screenHeight = this.width * screenProportions;
-            // if (gameData.positionLayout === 'bottom') {
-            //     settings.shift = (this.height - this.screenHeight);
-            //     const canvas = document.getElementsByTagName('canvas');
-            //     canvas[0].style.position = 'fixed';
-            //     canvas[0].style.bottom = '0';
-            //     canvas[0].style.transform = 'translate(-50%, 0)';
-            //     canvas[0].style.top = 'unset';
-            // } else settings.shift = (this.height - this.screenHeight) / 2;
             settings.shift = (this.height - this.screenHeight) / 2;
         } else if (clientHeight > 812) {
             const height = clientHeight * window.devicePixelRatio; // multiply by devisePixel Ratio iPoneX - default
             this.screenHeight = clientWidth * screenProportions * window.devicePixelRatio; // multiply by devisePixel Ratio iPoneX - default
             const screenHH = clientWidth * assetsProportion * window.devicePixelRatio; // multiply by devisePixel Ratio iPoneX - default
 
-            // if (gameData.positionLayout === 'bottom') {
-            //     settings.shift = (screenHH - height) - 10;
-            //     const canvas = document.getElementsByTagName('canvas');
-            //     canvas[0].style.position = 'fixed';
-            //     canvas[0].style.bottom = '0';
-            //     canvas[0].style.transform = 'translate(-50%, 0)';
-            //     canvas[0].style.top = 'unset';
-            // } else settings.shift = Math.abs((screenHH - height) / 2) - 10;
             settings.shift = Math.abs((screenHH - height) / 2) - 10;
             settings.outsideShift = settings.shift * 2;
         } else {
@@ -252,4 +218,31 @@ export default class MainGame {
 
     //     return scaleScene;
     // }
+
+    async getUsers() {
+        await fetch('http://localhost:5000/users')
+            .then(response => response.json())
+            .then(data => console.log('All user:', data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    async getScore() {
+        await fetch('http://localhost:5000/highscores')
+            .then(response => response.json())
+            .then(data => console.log('All user scores:', data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    async setScore(userId, score) {
+        fetch('http://localhost:5000/submit-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: 581699737, score: score })
+        })
+            .then(response => response.json())
+            .then(data => console.log('Score submitted:', data))
+            .catch(error => console.error('Error:', error));
+    }
 }

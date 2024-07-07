@@ -104,43 +104,58 @@ export default class StartScreen extends Container {
         this.btnCont.x = (this.width - this.btnCont.width) / 2;
         this.btnCont.y = this.timerCont.getBounds().bottom + 100;
 
-        if(!this.game.isAuth) {
+        this.nameCont = new Container();
+        this.nameCont.y = this.btnCont.getBounds().bottom + 200;
+        this.screenContainer.addChild(this.nameCont);
 
-            this.nameCont = new Container();
-            this.nameCont.y = this.btnCont.getBounds().bottom + 200;
-            this.screenContainer.addChild(this.nameCont);
+        this.btnSubmit = new Button({
+            resource: 'btn_sub_inactive',
+            btnScale: 1.1,
+            text: 'START',
+            fontFamily: 'OpenSans_Extrabold',
+            fontSize: 100
+        });
+        this.btnSubmit.x = ( this.width - this.btnSubmit.width) / 2;
 
-            this.btnSubmit = new Button({
-                resource: 'btn_sub_inactive',
-                btnScale: 1.1,
-                text: 'START',
-                fontFamily: 'OpenSans_Extrabold',
-                fontSize: 100
-            });
-            this.btnSubmit.x = ( this.width - this.btnSubmit.width) / 2;
+        this.btnSubmit.onClick( ()=>{
+            this.interactiveChildren = false;
+            this.emitter.emit('countdown');
+        });
+        this.nameCont.addChild(this.btnSubmit);
 
-            this.btnSubmit.onClick( ()=>{
-                this.btnSubmit.interactive = false;
-                this.btnSubmit.destroy();
-                this.emitter.emit('countdown');
-            });
-            this.nameCont.addChild(this.btnSubmit);
-            this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
-            this.interactive = true;
-
-        } else this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
+        this.btnScore = new Button({
+            resource: 'btn_sub_inactive',
+            btnScale: 1.1,
+            text: 'SCORES',
+            fontFamily: 'OpenSans_Extrabold',
+            fontSize: 100
+        });
+        this.btnScore.x = ( this.width - this.btnSubmit.width) / 2;
+        this.btnScore.y = this.btnScore.y + this.btnScore.height + 50;
+        this.nameCont.addChild(this.btnScore);
+        
+        this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
+        this.interactive = true;
 
         this.screenBack.rect(0, 0, this.screenContainer.width + 140, this.screenContainer.height + 170);
         this.screenBack.fill(0x101010);
         this.screenBack.x = (this.width - this.screenBack.getBounds().width) / 2;
-        // this.screenBack.y = this.screenContainer.y - 85;
-        // this.screenContainer.y = (this.game.app.screen.height - this.screenContainer.height) / 2 - this.game.shift;
         this.screenBack.y = 350;
         this.screenContainer.y = 420;
 
         if(this.game.width < 270) {
             this.drawScene(0.7);
         } 
+    }
+
+    hide() {
+        this.visible = false;
+        this.interactiveChildren = false;
+    }
+
+    show() {
+        this.visible = true;
+        this.interactiveChildren = true;
     }
 
     removeTimerInterval() {

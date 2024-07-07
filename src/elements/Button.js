@@ -6,8 +6,6 @@ export default class Button extends Container {
     constructor(options) {
         super();
 
-        
-
         this.btnWidth = options.btnWidth || 100;
         this.btnHeight = options.btnHeight || 50;
         this.btnColor = options.btnColor || 0xffffff;
@@ -21,7 +19,6 @@ export default class Button extends Container {
         this.fontFamily = options.fontFamily || 'Arial';
         this.fontColor = options.fontColor || 0xffffff;
         this.fontWeight = options.fontWeight || 'normal';
-
 
         this.createBtn();
     }
@@ -59,7 +56,7 @@ export default class Button extends Container {
     onClick(callback, context) {
 
         this.interactive = true;
-        this.buttonMode = true;
+        this.cursor = 'pointer';
 
         if (context) {
             this.on("pointerdown", callback, context);
